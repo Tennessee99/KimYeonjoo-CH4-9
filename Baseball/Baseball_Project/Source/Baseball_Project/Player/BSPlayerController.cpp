@@ -41,7 +41,7 @@ void ABSPlayerController::BeginPlay()
 		}
 	}
 
-	if (IsValid(ChatInputWidgetClass) == true)
+	if (IsValid(NotificationTextWidgetClass) == true)
 	{
 		NotificationTextWidgetInstance = CreateWidget<UUserWidget>(this, NotificationTextWidgetClass);
 		

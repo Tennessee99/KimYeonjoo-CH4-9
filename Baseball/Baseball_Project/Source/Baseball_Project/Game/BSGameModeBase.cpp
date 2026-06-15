@@ -7,6 +7,7 @@
 #include "Player/BSPlayerController.h"
 #include "EngineUtils.h"
 #include "Player/BSPlayerState.h"
+//#include "TimerManager.h"
 
 void ABSGameModeBase::OnPostLogin(AController* NewPlayer)
 {
@@ -17,10 +18,9 @@ void ABSGameModeBase::OnPostLogin(AController* NewPlayer)
 	if (IsValid(BSPlayerController) == true)
 	{
 		BSPlayerController->NotificationText = FText::FromString(TEXT("Connected to the game server."));
+
 		AllPlayerControllers.Add(BSPlayerController);
 
-
-		static int32 PlayerNumber = 0;
 		ABSPlayerState* BSPS = BSPlayerController->GetPlayerState<ABSPlayerState>();
 		if (IsValid(BSPS) == true)
 		{
@@ -135,6 +135,8 @@ void ABSGameModeBase::BeginPlay()
 	Super::BeginPlay();
 
 	SecretNumberString = GenerateSecretNumber();
+
+	//StartTurnTimer();
 }
 
 void ABSGameModeBase::PrintChatMessageString(ABSPlayerController* InChattingPlayerController, const FString& InChatMessageString)
@@ -142,7 +144,11 @@ void ABSGameModeBase::PrintChatMessageString(ABSPlayerController* InChattingPlay
 	FString ChatMessageString = InChatMessageString;
 	int Index = InChatMessageString.Len() - 3;
 	FString GuessNumberString = InChatMessageString.RightChop(Index);
-	if (IsGuessNumberString(GuessNumberString) == true)
+
+	const bool bIsGuessNumber = IsGuessNumberString(GuessNumberString);
+	
+
+	if (bIsGuessNumber == true)
 	{
 		FString JudgeResultString = JudgeResult(SecretNumberString, GuessNumberString);
 
@@ -156,10 +162,10 @@ void ABSGameModeBase::PrintChatMessageString(ABSPlayerController* InChattingPlay
 				FString CombinedMessageString = InChatMessageString + TEXT("->") + JudgeResultString;
 				BSPlayerController->ClientRPCPrintChatMessageString(CombinedMessageString);
 
-				int32 StrikeCount = FCString::Atoi(*JudgeResultString.Left(1));
-				JudgeGame(InChattingPlayerController, StrikeCount);
 			}
 		}
+				int32 StrikeCount = FCString::Atoi(*JudgeResultString.Left(1));
+				JudgeGame(InChattingPlayerController, StrikeCount);
 		
 	}
 	else
@@ -187,15 +193,22 @@ void ABSGameModeBase::IncreaseGuessCount(ABSPlayerController* InChattingPlayerCo
 
 void ABSGameModeBase::ResetGame()
 {
+	
 	SecretNumberString = GenerateSecretNumber();
 	for (const auto& BSPlayerController : AllPlayerControllers)
 	{
+		if (BSPlayerController.IsValid() == false)
+		{
+			continue;
+		}
 		ABSPlayerState* BSPS = BSPlayerController->GetPlayerState<ABSPlayerState>();
 		if (IsValid(BSPS) == true)
 		{
 			BSPS->CurrentGuessCount = 0;
 		}
 	}
+
+	//StartTurnTimer();
 }
 
 void ABSGameModeBase::JudgeGame(ABSPlayerController* InChattingPlayerController, int InStrikeCount)
@@ -245,4 +258,67 @@ void ABSGameModeBase::JudgeGame(ABSPlayerController* InChattingPlayerController,
 
 
 }
+
+//void ABSGameModeBase::StartTurnTimer()
+//{
+//
+//	ABSGameStateBase* BSGameState = GetGameState<ABSGameStateBase>();
+//	if (IsValid(BSGameState) == false)
+//	{
+//		return;
+//	}
+//
+//	BSGameState->RemainingTurnTime = TurnTimeLimit;
+//	BSGameState->bIsTurnActive = true;
+//
+//	GetWorldTimerManager().ClearTimer(TurnTimerHandle);
+//	GetWorldTimerManager().SetTimer(
+//		TurnTimerHandle,
+//		this,
+//		&ThisClass::TickTurnTimer,
+//		1.0f,
+//		true
+//	);
+//}
+//
+//void ABSGameModeBase::TickTurnTimer()
+//{
+//	ABSGameStateBase* BSGameState = GetGameState<ABSGameStateBase>();
+//	if (IsValid(BSGameState) == false)
+//	{
+//		return;
+//	}
+//
+//	BSGameState->RemainingTurnTime--;
+//
+//	if (BSGameState->RemainingTurnTime <= 0)
+//	{
+//		BSGameState->RemainingTurnTime = 0;
+//		BSGameState->bIsTurnActive = false;
+//
+//		GetWorldTimerManager().ClearTimer(TurnTimerHandle);
+//
+//		for (const auto& BSPlayerController : AllPlayerControllers)
+//		{
+//			if (BSPlayerController.IsValid() == true)
+//			{
+//				BSPlayerController->ClientRPCPrintChatMessageString(TEXT("Time Over,,"));
+//			}
+//		}
+//	}
+//}
+//
+//bool ABSGameModeBase::CanPlayTurn() const
+//{
+//	const ABSGameStateBase* BSGameState = GetGameState<ABSGameStateBase>();
+//	if (IsValid(BSGameState) == false)
+//	{
+//		return false;
+//	}
+//
+//	return BSGameState->bIsTurnActive && BSGameState->RemainingTurnTime > 0;
+//
+//}
+
+
 

@@ -6,6 +6,9 @@
 #include "Kismet/GameplayStatics.h"
 #include "Player/BSPlayerController.h"
 #include "EngineUtils.h"
+//#include "Net/UnrealNetwork.h"
+
+
 
 void ABSGameStateBase::MulticastRPCBroadcastLoginMessage_Implementation(const FString& InNameString)
 {
@@ -23,3 +26,14 @@ void ABSGameStateBase::MulticastRPCBroadcastLoginMessage_Implementation(const FS
 		}
 	}
 }
+
+//void ABSGameStateBase::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+//{
+//	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+//
+//	DOREPLIFETIME(ThisClass, RemainingTurnTime);
+//	DOREPLIFETIME(ThisClass, bIsTurnActive);
+//	
+//}
+
+

@@ -35,11 +35,22 @@ public:
 
 	void JudgeGame(ABSPlayerController* InChattingPlayerController, int InStrikeCount);
 
+	//void StartTurnTimer();
 
+	//void TickTurnTimer();
+
+	//bool CanPlayTurn() const;
+
+	
 
 protected:
 	FString SecretNumberString;
 
 	TArray<TWeakObjectPtr<ABSPlayerController>> AllPlayerControllers;
-	
+
+	//FTimerHandle TurnTimerHandle;
+
+	//UPROPERTY(EditDefaultsOnly)
+	//int32 TurnTimeLimit = 180;//시간 제한
+
 };
